@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escama Azulejos - Projeto Completo</title>
+
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Quicksand);
+      
+      /* Reset básico e variáveis CSS */
+      :root {
+        --color-bg: #69F7BE;
+        --color-text-main: #000000;
+        --color-primary: #FFFF00;
+        --wrapper-height: 87vh;
+        --image-max-width: 300px;
+        --image-margin: 3rem;
+        --font-family: "HK Grotesk";
+        --font-family-header: "HK Grotesk";
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      
+      [hidden] {
+        display: none !important;
+      }
+
+      /* Import fonts */
+      @font-face {
+        font-family: HK Grotesk;
+        src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Regular.otf?v=1603136326027")
+          format("opentype");
+      }
+      @font-face {
+        font-family: HK Grotesk;
+        font-weight: bold;
+        src: url("https://cdn.glitch.me/605e2a51-d45f-4d87-a285-9410ad350515%2FHKGrotesk-Bold.otf?v=1603136323437")
+          format("opentype");
+      }
+
+      /* Estilos do projeto principal - Escama Azulejos */
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: HK Grotesk;
+        background-color: var(--color-bg);
+      }
+
+      .tile {
+        position: absolute;
+        display: none;
+        -moz-perspective: 300px;
+        -webkit-perspective: 300px;
+        perspective: 300px;
+        -moz-transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+      }
+      .tile.from-top {
+        display: block;
+        -moz-perspective-origin: 50% 0;
+        -webkit-perspective-origin: 50% 0;
+        perspective-origin: 50% 0;
+      }
+      .tile.from-top .inlay {
+        -moz-transform-origin: 50% 0 0;
+        -webkit-transform-origin: 50% 0 0;
+        transform-origin: 50% 0 0;
+        -moz-transform: rotateX(-90deg);
+        -ms-transform: rotateX(-90deg);
+        -webkit-transform: rotateX(-90deg);
+        transform: rotateX(-90deg);
+      }
+      .tile.from-bottom {
+        display: block;
+        -moz-perspective-origin: 50% 100%;
+        -webkit-perspective-origin: 50% 100%;
+        perspective-origin: 50% 100%;
+      }
+      .tile.from-bottom .inlay {
+        -moz-transform-origin: 50% 100% 0;
+        -webkit-transform-origin: 50% 100% 0;
+        transform-origin: 50% 100% 0;
+        -moz-transform: rotateX(90deg);
+        -ms-transform: rotateX(90deg);
+        -webkit-transform: rotateX(90deg);
+        transform: rotateX(90deg);
+      }
+      .tile.from-left {
+        display: block;
+        -moz-perspective-origin: 0 50%;
+        -webkit-perspective-origin: 0 50%;
+        perspective-origin: 0 50%;
+      }
+      .tile.from-left .inlay {
+        -moz-transform-origin: 0 50% 0;
+        -webkit-transform-origin: 0 50% 0;
+        transform-origin: 0 50% 0;
+        -moz-transform: rotateY(90deg);
+        -ms-transform: rotateY(90deg);
+        -webkit-transform: rotateY(90deg);
+        transform: rotateY(90deg);
+      }
+      .tile.from-right {
+        display: block;
+        -moz-perspective-origin: 100% 50%;
+        -webkit-perspective-origin: 100% 50%;
+        perspective-origin: 100% 50%;
+      }
+      .tile.from-right .inlay {
+        -moz-transform-origin: 100% 50% 0;
+        -webkit-transform-origin: 100% 50% 0;
+        transform-origin: 100% 50% 0;
+        -moz-transform: rotateY(-90deg);
+        -ms-transform: rotateY(-90deg);
+        -webkit-transform: rotateY(-90deg);
+        transform: rotateY(-90deg);
+      }
+
+      .inlay {
+        width: 100%;
+        height: 100%;
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        -webkit-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+      }
+
+      .cover {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        -moz-transition: background-color 0.3s ease-in-out;
+        -o-transition: background-color 0.3s ease-in-out;
+        -webkit-transition: background-color 0.3s ease-in-out;
+        transition: background-color 0.3s ease-in-out;
+      }
+
+      .tile .inlay.show {
+        -moz-transform: rotateX(0) rotateY(0);
+        -ms-transform: rotateX(0) rotateY(0);
+        -webkit-transform: rotateX(0) rotateY(0);
+        transform: rotateX(0) rotateY(0);
+      }
+      .tile .inlay.show .cover {
+        background-color: transparent;
+      }
+
+      #tag.before {
+        width: 0;
+        left: 0;
+        padding: 15px 0 0 0;
+      }
+      #tag.before h1,
+      #tag.before p,
+      #tag.before ul,
+      #tag.before span {
+        opacity: 0;
+        -moz-transform: translate3d(-50px, 0, 0);
+        -ms-transform: translate3d(-50px, 0, 0);
+        -webkit-transform: translate3d(-50px, 0, 0);
+        transform: translate3d(-50px, 0, 0);
+      }
+
+      #tag.in {
+        width: 220px;
+      }
+
+      #tag {
+        -moz-transition: all 0.3s cubic-bezier(0.8, 0, 0.2, 1);
+        -o-transition: all 0.3s cubic-bezier(0.8, 0, 0.2, 1);
+        -webkit-transition: all 0.3s cubic-bezier(0.8, 0, 0.2, 1);
+        transition: all 0.3s cubic-bezier(0.8, 0, 0.2, 1);
+        position: fixed;
+        width: 180px;
+        height: 180px;
+        top: 20px;
+        left: 20px;
+        font-family: "Quicksand", sans-serif;
+        padding: 15px 0 0 20px;
+        background-color: #000;
+        color: #fff;
+      }
+      #tag h1,
+      #tag p,
+      #tag ul,
+      #tag span {
+        opacity: 1;
+        -moz-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+      }
+      #tag h1 {
+        -moz-transition: all 0.3s ease-in-out 0.3s;
+        -o-transition: all 0.3s ease-in-out 0.3s;
+        -webkit-transition: all 0.3s ease-in-out;
+        -webkit-transition-delay: 0.3s;
+        transition: all 0.3s ease-in-out 0.3s;
+        font-size: 30px;
+        font-weight: 400;
+        margin: 0;
+      }
+      #tag p {
+        -moz-transition: all 0.3s ease-in-out 0.4s;
+        -o-transition: all 0.3s ease-in-out 0.4s;
+        -webkit-transition: all 0.3s ease-in-out;
+        -webkit-transition-delay: 0.4s;
+        transition: all 0.3s ease-in-out 0.4s;
+      }
+      #tag ul {
+        -moz-transition: all 0.3s ease-in-out 0.6s;
+        -o-transition: all 0.3s ease-in-out 0.6s;
+        -webkit-transition: all 0.3s ease-in-out;
+        -webkit-transition-delay: 0.6s;
+        transition: all 0.3s ease-in-out 0.6s;
+      }
+      #tag p,
+      #tag ul a {
+        font-size: 12px;
+        font-weight: 700;
+      }
+      #tag a {
+        color: #fff;
+        text-decoration: none;
+      }
+      #tag a:hover {
+        background-color: #333;
+      }
+      #tag span {
+        -moz-transition: all 0.3s ease-in-out 0.7s;
+        -o-transition: all 0.3s ease-in-out 0.7s;
+        -webkit-transition: all 0.3s ease-in-out;
+        -webkit-transition-delay: 0.7s;
+        transition: all 0.3s ease-in-out 0.7s;
+        display: inline-block;
+        margin-top: 40px;
+        font-size: 10px;
+      }
+      #tag ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Estilos adicionais do Glitch */
+      .btn--remix {
+        font-family: HK Grotesk;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        line-height: 1rem;
+        font-weight: 500;
+        height: 2.75rem;
+        align-items: center;
+        cursor: pointer;
+        background: #FFFFFF;
+        border: 1px solid #000000;
+        box-sizing: border-box;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #000;
+        white-space: nowrap;
+        margin-left: auto;
+      }
+      .btn--remix img {
+        margin-right: 0.5rem;
+      }
+      .btn--remix:hover {
+        background-color: #D0FFF1;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        margin: 1rem auto 0;
+        padding: 1rem 0 0.75rem 0;
+        width: 100%;
+        flex-wrap: wrap;
+        border-top: 4px solid #fff;
+      }
+
+      .footer a:not(.btn--remix):link,
+      a:not(.btn--remix):visited {
+        font-family: HK Grotesk;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 1.1rem;
+        color: #000;
+        text-decoration: none;
+        border-style: none;
+      }
+      .footer a:hover {
+        background: var(--color-primary);
+      }
+
+      .footer .links {
+        padding: 0.5rem 1rem 1.5rem;
+        white-space: nowrap;
+      }
+
+      .divider {
+        padding: 0 1rem;
+      }
+
+      .wrapper {
+        min-height: var(--wrapper-height);
+        display: grid;
+        place-items: center;
+        margin: 0 1rem;
+      }
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .title {
+        color: #2800FF;
+        font-family: HK Grotesk;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 100px;
+        line-height: 105%;
+        margin: 0;
+      }
+
+      .illustration {
+        max-width: 100%;
+        max-height: var(--image-max-width);
+        margin-top: var(--image-margin);
+      }
+
+      .instructions {
+        margin: 1rem auto 0;
+      }
+
+      button,
+      input {
+        font-family: inherit;
+        font-size: 100%;
+        background: #FFFFFF;
+        border: 1px solid #000000;
+        box-sizing: border-box;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        transition: 500ms;
+      }
+
+      h2 {
+        color: #2800FF;
+      }
+
+      .illustration:active {
+        transform: translateY(5px);
+      }
+
+      .dipped {
+        transform: translateY(5px);
+      }
+
+      .fileopener {
+        cursor:pointer;
+        font-weight:bold;
+        border-bottom:3px solid var(--color-primary);
+        color: var(--color-secondary);
+      }
+      .fileopener:hover {
+        border-bottom:3px solid var(--color-secondary);
+      }
+    </style>
+
+    <script>
+      window.console = window.console || function (t) {};
+    </script>
+  </head>
+
+  <body translate="no">
+    <div id="container"></div>
+
+    <script>
+      /*
+       * O código original usa AMD e pode ser encontrado aqui:
+       * https://github.com/MathiasPaumgarten/spread
+       */
+
+      var container = document.getElementById("container");
+
+      var orientationmove = {
+        TOP: 0,
+        RIGHT: 1,
+        BOTTOM: 2,
+        LEFT: 3,
+      };
+
+      var options = {
+        tileSize: 330,
+        color: "#f4efe9",
+        randomColor: true,
+      };
+
+      var color = (function () {
+        var values = [
+          "#F4EFE9",
+          "#E2EC6F",
+          "#F3DE8A",
+          "#6DDDEE",
+          "#77F9F4",
+          "#E7E2DB",
+        ];
+        var drawnColors = []; // Array para armazenar as cores já sorteadas
+
+        return function () {
+          var availableColors = values.filter(function (color) {
+            return drawnColors.indexOf(color) === -1;
+          });
+
+          if (availableColors.length === 0) {
+            drawnColors = []; // Reseta o array de cores sorteadas caso todas tenham sido usadas
+            availableColors = values;
+          }
+
+          var index = randomInt(0, availableColors.length);
+          var selectedColor = availableColors[index];
+          drawnColors.push(selectedColor);
+          return selectedColor;
+        };
+      })();
+
+      var randomInt = function (min, max) {
+        return Math.floor(min + Math.random() * (max - min));
+      };
+      var random = function (min, max) {
+        return min + Math.random() * (max - min);
+      };
+
+      var Tile = function (x, y, color, onComplete) {
+        var div, inlay, cover;
+        var neighbors = [];
+        var isShown = false;
+
+        function initUI() {
+          div = document.createElement("div");
+          div.className = "tile";
+          div.style.width = options.tileSize + "px";
+          div.style.height = options.tileSize + "px";
+          div.style.top = y * options.tileSize + "px";
+          div.style.left = x * options.tileSize + "px";
+
+          inlay = document.createElement("div");
+          inlay.className = "inlay";
+          inlay.style.backgroundColor = color;
+
+          cover = document.createElement("div");
+          cover.className = "cover";
+
+          div.appendChild(inlay);
+          inlay.appendChild(cover);
+        }
+
+        // ------
+        // PUBLIC
+        // ------
+
+        this.isShown = function () {
+          return isShown;
+        };
+
+        this.getElement = function () {
+          return div;
+        };
+
+        this.addNeighbor = function (direction, neighbor) {
+          neighbors[direction] = neighbor;
+        };
+
+        this.fromTop = function () {
+          div.classList.add("from-top");
+          show();
+        };
+
+        this.fromBottom = function () {
+          div.classList.add("from-bottom");
+          show();
+        };
+
+        this.fromRight = function () {
+          div.classList.add("from-right");
+          show();
+        };
+
+        this.fromLeft = function () {
+          div.classList.add("from-left");
+          show();
+        };
+
+        function onTransitionEnd() {
+          for (var i = 0; i < neighbors.length; i++) {
+            if (neighbors[i] && !neighbors[i].isShown()) {
+              neighbors[i][getFunctionName(i)]();
+
+              setTimeout(onTransitionEnd, random(10, 200));
+              break;
+            }
+          }
+        }
+
+        // -------
+        // PRIVATE
+        // -------
+
+        function getFunctionName(index) {
+          return ["fromBottom", "fromLeft", "fromTop", "fromRight"][index];
+        }
+
+        function show() {
+          isShown = true;
+
+          setTimeout(function () {
+            inlay.classList.add("show");
+
+            setTimeout(onTransitionEnd, random(200, 300));
+            setTimeout(onComplete, 300);
+          }, 50);
+        }
+
+        initUI();
+      };
+
+      var Controller = function (container, size, position) {
+        var width = Math.ceil(size.width / options.tileSize);
+        var height = Math.ceil(size.height / options.tileSize);
+        var tiles = [];
+        var onComplete = null;
+        var completeCount = 0;
+        var tileColor = options.randomColor ? color() : options.color;
+
+        function init() {
+          fillScreen();
+          snowball();
+        }
+
+        // ------
+        // PUBLIC
+        // ------
+
+        this.onComplete = function (closure) {
+          onComplete = closure;
+        };
+
+        this.getColor = function () {
+          return tileColor;
+        };
+
+        // -------
+        // PRIVATE
+        // -------
+
+        function fillScreen() {
+          var tile;
+          var length = width * height;
+
+          for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+              tile = new Tile(x, y, tileColor, tileComplete);
+
+              container.appendChild(tile.getElement());
+
+              tiles.push(tile);
+            }
+          }
+
+          for (var i = 0; i < length; i++) {
+            tile = tiles[i];
+            row = ~~(i / width);
+            col = i % width;
+
+            if (col < width - 1)
+              tile.addNeighbor(orientationmove.RIGHT, tiles[i + 1]);
+
+            if (col > 0) tile.addNeighbor(orientationmove.LEFT, tiles[i - 1]);
+
+            if (row > 0) tile.addNeighbor(orientationmove.TOP, tiles[i - width]);
+
+            if (row < height - 1)
+              tile.addNeighbor(orientationmove.BOTTOM, tiles[i + width]);
+          }
+        }
+
+        function snowball() {
+          var row = ~~(position.y / options.tileSize);
+          var col = ~~(position.x / options.tileSize);
+
+          tiles[col + row * width].fromTop();
+        }
+
+        function tileComplete() {
+          completeCount++;
+
+          if (completeCount === tiles.length && onComplete) {
+            onComplete();
+          }
+        }
+
+        init();
+      };
+
+      function initListeners() {
+        document.addEventListener("click", onClick, false);
+        document.addEventListener("touchstart", onTouchEnd, false);
+      }
+
+      function onClick(event) {
+        var div = document.createElement("div");
+
+        var size = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
+
+        var position = {
+          x: event.pageX,
+          y: event.pageY,
+        };
+
+        var controller = new Controller(div, size, position);
+
+        controller.onComplete(function () {
+          document.body.style.backgroundColor = controller.getColor();
+          container.removeChild(div);
+        });
+
+        container.appendChild(div);
+      }
+
+      function onTouchEnd(event) {
+        var touch = event.touches[0];
+
+        event.pageX = touch.pageX;
+        event.pageY = touch.pageY;
+
+        onClick(event);
+      }
+
+      function start() {
+        var event = {
+          pageX: window.innerWidth / 2,
+          pageY: window.innerHeight / 2,
+        };
+
+        onClick(event);
+      }
+
+      initListeners();
+
+      setTimeout(start, 1000);
+
+      // Código adicional do Glitch
+      console.log("Hello 🌎");
+
+      const btn = document.querySelector("button");
+      if (btn) {
+        btn.onclick = function () {
+          btn.classList.toggle("dipped");
+        };
+      }
+
+      // Open file when the link in the preview is clicked
+      let goto = (file, line) => {
+        window.parent.postMessage(
+          { type: "glitch/go-to-line", payload: { filePath: file, line: line } }, "*"
+        );
+      };
+      
+      // Get the file opening button from its class name
+      const filer = document.querySelectorAll(".fileopener");
+      filer.forEach((f) => {
+        f.onclick = () => { goto(f.dataset.file, f.dataset.line); };
+      });
+    </script>
+  </body>
+</html>
